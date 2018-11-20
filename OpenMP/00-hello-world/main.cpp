@@ -7,7 +7,10 @@ int main(int argc, char** argv) {
 #pragma omp parallel private(thread_id)
 	{
 		thread_id = omp_get_thread_num();
-		std::cout << "Hello world from thread " << thread_id << std::endl;
+		#pragma omp critical
+		{
+			std::cout << "Hello world from thread " << thread_id << std::endl;
+		}
 		
 		if (thread_id == 0) {
 			num_threads = omp_get_num_threads();

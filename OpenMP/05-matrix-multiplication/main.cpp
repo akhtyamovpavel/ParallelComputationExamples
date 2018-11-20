@@ -33,9 +33,9 @@ int main(int argc, char** argv) {
 
 	double start_time = omp_get_wtime();
 
-#pragma omp parallel for default(shared) private(parallel_index, parallel_jndex) collapse(2)
-	for (parallel_index = 0; parallel_index < num_elements; ++parallel_index) {
-		for (parallel_jndex = 0; parallel_jndex < num_elements; ++parallel_jndex) {
+#pragma omp parallel for default(shared) private(parallel_index, parallel_jndex)
+	for (parallel_jndex = 0; parallel_jndex < num_elements; ++parallel_jndex) {
+		for (parallel_index = 0; parallel_index < num_elements; ++parallel_index) {
 			for (int kndex = 0; kndex < num_elements; ++kndex) {
 				result[parallel_index][parallel_jndex] = result[parallel_index][parallel_jndex] + a[parallel_index][kndex] * b[kndex][parallel_jndex];
 			}
