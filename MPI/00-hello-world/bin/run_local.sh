@@ -1,3 +1,2 @@
 #!/bin/bash
-module add mpi/openmpi4-x86_64
-sbatch -
+mpiexec -np 4 ./MpiHelloWorld
