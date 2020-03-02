@@ -4,6 +4,7 @@
 #include <random>
 #include <ctime>
 #include <functional>
+#include <cstdio>
 
 typedef struct {
     int width;
@@ -62,11 +63,10 @@ void MatMul(Matrix* A, Matrix* B, Matrix* C) {
 
     cudaEventRecord(start);
     MatMulKernel<<<dim_grid, dim_block>>>(&d_A, &d_B, &d_C);
-        float milliseconds = 0;
+    float milliseconds = 0;
 
-
-    cudaMemcpy(C->elements, d_C.elements, size, cudaMemcpyDeviceToHost);
     cudaEventRecord(stop);
+    cudaMemcpy(C->elements, d_C.elements, size, cudaMemcpyDeviceToHost);
     cudaEventSynchronize(stop);
 
     cudaEventElapsedTime(&milliseconds, start, stop); 
@@ -80,6 +80,7 @@ void MatMul(Matrix* A, Matrix* B, Matrix* C) {
 __global__ void MatMulKernel(Matrix *A, Matrix *B, Matrix *C) {
     float value = 0;
 
+    printf("%d %d %d %d\n", blockIdx.x, blockIdx.y, threadIdx.x, threadIdx.y);
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int column = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -119,9 +120,9 @@ void FreeMatrix(Matrix* matrix) {
 }
 
 int main(int argc, char** argv) {
-    Matrix *A = CreateMatrix(8192);
-    Matrix *B = CreateMatrix(8192);
-    Matrix *C = CreateMatrix(8192);
+    Matrix *A = CreateMatrix(32);
+    Matrix *B = CreateMatrix(32);
+    Matrix *C = CreateMatrix(32);
 
     MatMul(A, B, C);
     

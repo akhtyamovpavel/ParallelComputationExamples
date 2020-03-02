@@ -7,7 +7,7 @@
 
 __global__ void Difference(int n, int* input, int* result) {
     int tid = blockDim.x * blockIdx.x + threadIdx.x;
-    __shared__ int s_data[BLOCKSIZE];
+    __shared__ int s_data[BLOCKSIZE]; // blockDim same
 
     s_data[threadIdx.x] = input[tid];
 

@@ -7,7 +7,7 @@ void add(int n, float* x, float* y, float* z) {
 	int stride = blockDim.x * gridDim.x;
 
 	for (int i = index; i < n; i += stride) {
-        int iindex = (i / 32) * 32 + (i) % 32; // call for coalescing 
+        int iindex = (i / 32) * 32 + (31 - i % 32); // call for coalescing 
 		z[i] = 2.0f * x[iindex] + y[iindex];
 	}	
 }
