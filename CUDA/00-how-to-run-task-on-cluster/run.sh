@@ -6,4 +6,5 @@
 #SBATCH --gres gpu:1
 #SBATCH --comment "Test gpu setup"
 module add cuda/10.1
-
+nvcc main.cu -o example
+./example
