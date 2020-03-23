@@ -3,11 +3,13 @@
 __device__ void WarpReduce(volatile int* shared_data, int tid) {
     
     shared_data[tid] += shared_data[tid + 32];
-    shared_data[tid] += __shfl_down_sync(-1, shared_data[tid], 16);
-    shared_data[tid] += __shfl_down_sync(-1, shared_data[tid], 8);
-    shared_data[tid] += __shfl_down_sync(-1, shared_data[tid], 4);
-    shared_data[tid] += __shfl_down_sync(-1, shared_data[tid], 2);
-    shared_data[tid] += __shfl_down_sync(-1, shared_data[tid], 1);
+	int val = shared_data[tid];
+	val += __shfl_down_sync(-1, val, 16);
+	val += __shfl_down_sync(-1, val, 8);
+	val += __shfl_down_sync(-1, val, 4);
+	val += __shfl_down_sync(-1, val, 2);
+	val += __shfl_down_sync(-1, val, 1);
+	shared_data[tid] = val;
 }
 
 __global__ void Reduce(int* in_data, int* out_data) {
