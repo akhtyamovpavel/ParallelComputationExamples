@@ -4,7 +4,7 @@
 #define NUM_BANKS 32
 #define LOG_NUM_BANKS 5
 
-#define GET_OFFSET(idx) ((idx) >> (LOG_NUM_BANKS))
+#define GET_OFFSET(idx) (idx >> LOG_NUM_BANKS)
 
 __global__ void Scan(int* in_data, int* out_data) {
     // in_data ->  [1 2 3 4 5 6 7 8], block_size 4
@@ -17,6 +17,8 @@ __global__ void Scan(int* in_data, int* out_data) {
     unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
 
     shared_data[tid + GET_OFFSET(tid)] = in_data[index];
+
+    // shared_data[tid + (tid >> LOG_NUM_BANKS)] = in_data[index];
 
     // shared_data -> [1, 2, 3, 4]
     __syncthreads();
@@ -56,33 +58,6 @@ __global__ void Scan(int* in_data, int* out_data) {
         }
         __syncthreads();
 
-        // step 2
-        // 1 2 1 0 1 2 1 4
-        // tid == 3
-        // temp = 2
-        // 1 0 1 0 1 2 1 4
-        // 1 0 1 2 1 2 1 4
-        // tid == 7
-        // temp = 2
-        // 1 0 1 2 1 4 1 4
-        // 1 0 1 2 1 4 1 6
-
-        // tid == 1
-        // temp = 0
-        // 0 1 1 2 1 4 1 6
-        // 0 1 1 2 1 4 1 6
-        // tid == 3
-        // temp = 1
-        // 0 1 2 2 1 4 1 6
-        // 0 1 2 3 1 4 1 6
-        // tid == 5
-        // temp = 1
-        // 0 1 2 3 4 4 1 6
-        // 0 1 2 3 4 5 1 6
-        // tid == 7
-        // temp = 1
-        // 0 1 2 3 4 5 6 6
-        // 0 1 2 3 4 5 6 7
     }
     // if (blockIdx.x == 16383) {
     //     printf("%d %d %d %d\n", tid, tid + GET_OFFSET(tid), shared_data[tid + GET_OFFSET(tid)], index);

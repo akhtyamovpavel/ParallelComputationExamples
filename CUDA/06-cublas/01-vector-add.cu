@@ -1,4 +1,3 @@
-// #include <cstdio>
 #include <iostream>
 #include <cublas_v2.h>
 
@@ -19,10 +18,21 @@ int main() {
     cuda_stat = cudaMalloc(&d_x, sizeof(float) * array_size);
 
     stat = cublasCreate(&handle);
-    stat = cublasSetVector(array_size, sizeof(*h_x), h_x, /* space by host */ 1, d_x, /* space by device */ 1);
+    stat = cublasSetVector(
+        array_size,
+        sizeof(*h_x),
+        h_x,
+        /* space by host */ 1,
+        d_x,
+        /* space by device */ 1
+    );
     int result;
 
-    stat = cublasIsamax(handle, array_size, d_x, 1, &result);
+    stat = cublasIsamax(handle, array_size, d_x, 3, &result);
+
+    // 0, 3, 6, 9, ...
+    // 1, 2, 3, 4, 5, ...
+    // max element located at (1398102 - 1) * 3
 
     std::cout << result << std::endl;
 
