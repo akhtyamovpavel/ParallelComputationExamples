@@ -59,7 +59,7 @@ int main() {
 
     std::cout << milliseconds << " elapsed" << std::endl;
 
-    float numBytes = N * 4;
+    float numBytes = N * 8;
     float operationsByThread = 3; // read x + read y + write y
     float bandwidth = numBytes * operationsByThread / 1e6 / milliseconds;
 

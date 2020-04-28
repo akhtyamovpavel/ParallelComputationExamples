@@ -68,12 +68,18 @@ int main() {
 
 
     cudaEventRecord(start);
+    // 0
 
     Reduce<<<num_blocks, block_size, sizeof(int) * block_size>>>(d_array, d_blocksum);
+    // device - some time - t1: time - t1
+    // host - immediately: time - 0
 
     cudaEventRecord(stop);
 
     cudaMemcpy(h_blocksum, d_blocksum, sizeof(int) * num_blocks, cudaMemcpyDeviceToHost);
+
+    // device - t2: time t1 + t2
+    // host - t1 + t2 : time t1 + t2
 
     cudaEventSynchronize(stop);
 
