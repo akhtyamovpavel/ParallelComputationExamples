@@ -3,7 +3,7 @@
 
 int main(int argc, char** argv) {
 	
-	MPI_Init(NULL, NULL);
+	MPI_Init(&argc, &argv);
 
 	int world_size;
 	MPI_Comm_size(MPI_COMM_WORLD, &world_size);

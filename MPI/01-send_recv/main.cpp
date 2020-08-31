@@ -3,7 +3,7 @@
 
 int main(int argc, char** argv) {
 	
-	MPI_Init(NULL, NULL);
+	MPI_Init(&argc, &argv);
 
 	int world_size;
 	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
@@ -14,12 +14,38 @@ int main(int argc, char** argv) {
 	
 	int number;
 
-	if (world_rank == 0) {
-		number = 100500;
-		MPI_Send(&number, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+    int array[10];
+
+	MPI_Status status;
+    if (world_rank == 0) {
+        for (int i = 0; i < 10; ++i) {
+            array[i] = i;
+        }
+
+		MPI_Send(
+            &array[5] /* pointer to start */,
+            5 /* number of words */,
+            MPI_INT /* word type */, 
+            1 /* rank of receiver */, 
+            0 /* tag */,
+            MPI_COMM_WORLD /* communicator: default - all world */
+        );
 	} else if (world_rank == 1) {
-		MPI_Recv(&number, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		std::cout << "Process 1 received " << number << " from process 0";
+		MPI_Recv(
+            &array[5] /* pointer to start */, 
+            5 /* number of words */, 
+            MPI_INT /* type of word */, 
+            0 /* rank of sender */, 
+            0 /* tag */, 
+            MPI_COMM_WORLD /* communicator: default - all world */,
+            &status
+        );
+		std::cout << "Process 1 received 5 elements from process 0. They are" << std::endl;
+
+        for (int i = 5; i < 10; ++i) {
+            std::cout << array[i] << " ";
+        }
+        std::cout << std::endl;
 	}
 
 	
