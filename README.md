@@ -1,5 +1,5 @@
 # ParallelComputationExamples
-Examples of MPI and OpenMP (adapted from MPI Tutorial)
+Примеры кодов с MPI, OpenMP и CUDA. Код собран при помощи CMake.
 
 ## Инструкция по использованию MPI кластера
 
