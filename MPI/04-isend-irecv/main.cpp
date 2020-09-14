@@ -18,20 +18,32 @@ int main(int argc, char** argv) {
 			MPI_Send(&num_tasks, 1, MPI_INT, local_rank, 0, MPI_COMM_WORLD);
 		}
 
+        int counts[world_size];
+        for (int i = 0; i < world_size; ++i) {
+            counts[i] = 0;
+        }
 		for (int i = 0; i < num_tasks * (world_size - 1); ++i) {
 			int flag;
 			MPI_Request request;
 			MPI_Irecv(&flag, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &request);
 			MPI_Status status;
 			MPI_Wait(&request, &status);
+            
+            counts[status.MPI_SOURCE]++;
 
-			std::cout << i + 1 << " tasks completed " << std::endl;
+            if (i % 25 == 24) {
+			    std::cout << i + 1 << " tasks completed " << std::endl;
+                for (int j = 1; j < world_size; ++j) {
+                    std::cout << counts[j] << " ";
+                }
+                std::cout << std::endl;
+            }
 		}
 	} else {
 		int num_tasks;
 		MPI_Recv(&num_tasks, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		for (int task_id = 0; task_id < num_tasks; ++task_id) {
-			usleep(100000);
+            // usleep(100000);
 			int completed = 1;
 			MPI_Request request;
 			MPI_Isend(&completed, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &request);
