@@ -48,10 +48,10 @@ int main() {
     cudaEventRecord(start);
 	add<<<numBlocks, blockSize>>>(N, d_x, d_y);
 
-    cudaEventRecord(stop);
+    // cudaEventRecord(stop);
 
 	cudaMemcpy(y, d_y, size, cudaMemcpyDeviceToHost);
-
+    cudaEventRecord(stop);
     cudaEventSynchronize(stop);
     
     float milliseconds = 0;
