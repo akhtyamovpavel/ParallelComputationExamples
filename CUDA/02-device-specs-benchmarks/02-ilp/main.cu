@@ -2,15 +2,15 @@
 
 
 __global__ void SumV0(int* x, int* y, int* result) {
+    // 1x registers are available here
     int tid = threadIdx.x + blockDim.x * blockIdx.x;
-
     int stride = gridDim.x * blockDim.x;
-
     result[tid] = x[tid] + y[tid];
 
 }
 
 __global__ void SumV1(int *x, int* y, int* result) {
+    // 2x registers are available here
     int double_tid = threadIdx.x + 2 * blockDim.x * blockIdx.x;
 
     result[double_tid] = x[double_tid] + y[double_tid];
@@ -56,7 +56,7 @@ int main() {
     cudaEventCreate(&end1);
 
     cudaEventRecord(start0);    
-    SumV1<<<num_blocks / 2, block_size>>>(d_x, d_y, d_result);
+    SumV1<<<num_blocks, block_size / 2>>>(d_x, d_y, d_result);
     cudaEventRecord(end0);
     cudaEventSynchronize(end0);
     float millis0 = 0.0;
@@ -69,7 +69,7 @@ int main() {
     float millis1 = 0.0;
     cudaEventElapsedTime(&millis1, start1, end1);
 
-    std::cout << "Zero " << millis0 << " ilp 1 " << millis1 << std::endl;
+    std::cout << "ILP 2: " << millis0 << " ILP 1: " << millis1 << std::endl;
 
     int *h_result = new int[array_size];
 
