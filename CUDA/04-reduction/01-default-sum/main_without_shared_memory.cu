@@ -1,23 +1,21 @@
 #include <iostream>
 
-__global__ void Reduce(int* in_data, int* out_data) {
+__global__ void Reduce(int* in_data, int* tmp_data, int* out_data) {
     extern __shared__ int shared_data[];
 
     unsigned int tid = threadIdx.x;
     unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
 
-    shared_data[tid] = in_data[index];
-    __syncthreads();
+    tmp_data[index] = in_data[index];
     
     for (unsigned int s = 1; s < blockDim.x; s *= 2) {
         if (tid % (2 * s) == 0) {
-            shared_data[tid] += shared_data[tid + s];
+            tmp_data[tid] += shared_data[tid + s];
         }
-        __syncthreads();
     }
 
     if (tid == 0) {
-        out_data[blockIdx.x] = shared_data[0];
+        out_data[blockIdx.x] = tmp_data[index];
     }
 }
 
@@ -33,7 +31,9 @@ int main() {
     }
 
     int* d_array;
+    int* tmp_array;
     cudaMalloc(&d_array, sizeof(int) * array_size);
+    cudaMalloc(&tmp_array, sizeof(int) * array_size);
 
     cudaMemcpy(d_array, h_array, sizeof(int) * array_size, cudaMemcpyHostToDevice);
 
@@ -53,7 +53,7 @@ int main() {
 
     cudaEventRecord(start);
 
-    Reduce<<<num_blocks, block_size, sizeof(int) * block_size>>>(d_array, d_blocksum);
+    Reduce<<<num_blocks, block_size, sizeof(int) * block_size>>>(d_array, tmp_array, d_blocksum);
 
     cudaEventRecord(stop);
 

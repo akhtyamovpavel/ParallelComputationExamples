@@ -3,18 +3,21 @@
 #include <cassert>
 
 
-#define BLOCKSIZE 256
+#define BLOCKSIZE 512
 
-__global__ void Difference(int n, int* input, int* result) {
+__global__ void ComputeTriSum(int n, int* input, int* result) {
     int tid = blockDim.x * blockIdx.x + threadIdx.x;
-    int x_i = input[tid];
-    if (tid > 0) {
-        int x_i_minus = input[tid - 1];
+    int result_tmp = 0;
 
-        result[tid] = x_i - x_i_minus;
-    } else {
-        result[tid] = x_i;
+    if (tid > 0) {
+        result_tmp = input[tid - 1];
     }
+    if (tid + 1 < n) {
+        result_tmp = result_tmp + input[tid + 1];    
+    }
+
+    result_tmp = result_tmp + input[tid];
+    result[tid] = result_tmp;
 }
 
 
@@ -24,7 +27,7 @@ int main() {
     int* h_array = new int[N];
     int* h_diff = new int[N];
     for (int i = 0; i < N; ++i) {
-        h_array[i] = i + 1;
+        h_array[i] = 1;
     }
     
     int* d_array;
@@ -43,7 +46,7 @@ int main() {
     cudaEventCreate(&stop);
 
     cudaEventRecord(start);
-    Difference<<<num_blocks, BLOCKSIZE>>>(N, d_array, d_diff);
+    ComputeTriSum<<<num_blocks, BLOCKSIZE>>>(N, d_array, d_diff);
     cudaEventRecord(stop);
 
 
@@ -55,8 +58,11 @@ int main() {
 
     cudaEventElapsedTime(&milliseconds, start, stop);
 
-    for (int i = 0; i < N; ++i) {
-        assert(h_diff[i] == 1);
+    for (int i = 1; i < N - 1; ++i) {
+        if (h_diff[i] != 3) {
+            std::cout << i << " " << h_diff[i] << std::endl;    
+        }
+        assert(h_diff[i] == 3);
     }
 
     std::cout << milliseconds << " elapsed" << std::endl;
