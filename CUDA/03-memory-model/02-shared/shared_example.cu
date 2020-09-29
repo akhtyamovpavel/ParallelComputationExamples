@@ -8,15 +8,15 @@
 __global__ void ComputeThreeSum(int n, int* input, int* result) {
     int tid = blockDim.x * blockIdx.x + threadIdx.x;
     int local_tid = threadIdx.x;
-    __shared__ int s_data[BLOCKSIZE]; // blockDim same
+    __shared__ int s_data[BLOCKSIZE]; // unique for every block!
 
-    float tmp = 0.0f;
-    s_data[local_tid] = input[tid];
+    int tmp = 0;
+    s_data[local_tid] = input[tid]; // copy data to shared memory
     
     __syncthreads();
 
     if (local_tid > 0) {
-        tmp = s_data[local_tid];
+        tmp = s_data[local_tid - 1];
     } else if (tid > 0) {
         tmp = input[tid - 1];
     }

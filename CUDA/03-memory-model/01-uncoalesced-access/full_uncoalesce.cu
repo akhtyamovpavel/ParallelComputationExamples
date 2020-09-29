@@ -12,7 +12,7 @@ void add(int n, float* x, float* y, float* z) {
 __global__
 void stupid_add(int n, float* x, float* y, float* z) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
-    
+
     int double_index = 2 * index;
     int double_plus_one = 2 * index + 1;
     z[double_index] = 2.0f * x[double_index] + y[double_index];

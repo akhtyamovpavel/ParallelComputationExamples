@@ -1,8 +1,6 @@
 #include <iostream>
 
 __global__ void Reduce(int* in_data, int* tmp_data, int* out_data) {
-    extern __shared__ int shared_data[];
-
     unsigned int tid = threadIdx.x;
     unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -10,8 +8,9 @@ __global__ void Reduce(int* in_data, int* tmp_data, int* out_data) {
     
     for (unsigned int s = 1; s < blockDim.x; s *= 2) {
         if (tid % (2 * s) == 0) {
-            tmp_data[tid] += shared_data[tid + s];
+            tmp_data[index] += tmp_data[index + s];
         }
+        __threadfence();
     }
 
     if (tid == 0) {
