@@ -2,21 +2,26 @@
 #include <cmath>
 #include <cstdio>
 
+#define ILP 8
+
 __global__
 void add(int n, float* x, float* y, float* z) {
-    int double_tid = threadIdx.x + 2 * blockDim.x * blockIdx.x;
-    z[double_tid] = 2.0f * x[double_tid] + y[double_tid];
-    z[double_tid + blockDim.x] = 2.0f * x[double_tid + blockDim.x] + y[double_tid + blockDim.x]; 
+    int tid = threadIdx.x + ILP * blockDim.x * blockIdx.x;
+    for (int i = 0; i < ILP; ++i) {
+        int current_tid = tid + i * blockDim.x;
+        
+        z[current_tid] = 2.0f * x[current_tid] + y[current_tid];
+    }
 }
 
 __global__
 void stupid_add(int n, float* x, float* y, float* z) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
-
-    int double_index = 2 * index;
-    int double_plus_one = 2 * index + 1;
-    z[double_index] = 2.0f * x[double_index] + y[double_index];
-    z[double_plus_one] = 2.0f * x[double_plus_one] + y[double_plus_one];
+    int actual_tid = ILP * index;
+    for (int i = 0; i < ILP; ++i) {
+        int current_tid = actual_tid + i;
+        z[current_tid] = 2.0f * x[current_tid] + y[current_tid];
+    }
 }
 
 
@@ -56,7 +61,7 @@ int main() {
 
 
     cudaEventRecord(start);
-	add<<<numBlocks / 2, blockSize>>>(N, d_x, d_y, d_z);
+	add<<<numBlocks / ILP, blockSize>>>(N, d_x, d_y, d_z);
     cudaEventRecord(stop);
 
 	cudaMemcpy(z, d_z, size, cudaMemcpyDeviceToHost);
@@ -70,7 +75,7 @@ int main() {
     cudaEventCreate(&stop1);
 
     cudaEventRecord(start1);
-    stupid_add<<<numBlocks / 2, blockSize>>>(N, d_x, d_y, d_z);
+    stupid_add<<<numBlocks / ILP, blockSize>>>(N, d_x, d_y, d_z);
     cudaEventRecord(stop1);
 
     cudaMemcpy(z, d_z, size, cudaMemcpyDeviceToHost);
