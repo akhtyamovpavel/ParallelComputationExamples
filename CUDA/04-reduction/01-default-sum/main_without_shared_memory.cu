@@ -6,12 +6,12 @@ __global__ void Reduce(int* in_data, int* tmp_data, int* out_data) {
 
     tmp_data[index] = in_data[index];
 
-    __threadfence();    
+    // __syncthreads();    
     for (unsigned int s = 1; s < blockDim.x; s *= 2) {
         if (tid % (2 * s) == 0) {
             tmp_data[index] += tmp_data[index + s];
         }
-        __threadfence();
+        // __syncthreads();
     }
 
     if (tid == 0) {
