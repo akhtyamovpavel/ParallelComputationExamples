@@ -76,10 +76,10 @@ __global__ void Scan(int* in_data, int* out_data) {
         // 0 1 2 3 4 5 6 6
         // 0 1 2 3 4 5 6 7
     }
-    if (blockIdx.x == 16383) {
-        printf("%d %d %d\n", tid, shared_data[tid], index);
+    //if (blockIdx.x == 16383) {
+        //printf("%d %d %d\n", tid, shared_data[tid], index);
         // std::cout << shared_data[tid] << std::endl;
-    }
+    //}
     // block_idx = 0 -> [a0, a1, a2, a3]
     // block_idx = 1 -> [a4, a5, a6, a7]
     out_data[index] = shared_data[tid];
