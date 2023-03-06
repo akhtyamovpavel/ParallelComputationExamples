@@ -2,21 +2,20 @@
 #include <cmath>
 #include <cstdio>
 
-
-__constant__ int device_n;
-
+#define cudaErrchk(ans) { GPUAssert((ans), __FILE__, __LINE__); }
+inline void GPUAssert(cudaError_t code, const char *file, int line, bool abort=true){
+	if (code != cudaSuccess)
+	{
+		fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+		if (abort) exit(code);
+	}
+}
 
 __global__
 void add(int n, float* x, float* y) {
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
-	int stride = blockDim.x * gridDim.x;
-    
-//    if (threadIdx.x == 0) {
-//        printf("%d %d %d\n", blockIdx.x, gridDim.x, blockDim.x);
-//    }
-
-	for (int i = index; i < n; i += stride) {
-		y[i] = x[i] + y[i];
+	if (index < n) {
+		y[index] = 1 + 2;
 	}	
 }
 
@@ -42,11 +41,13 @@ int main() {
 	cudaMemcpy(d_x, h_x, size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_y, h_y, size, cudaMemcpyHostToDevice);
 
-	int blockSize = 256;
+	int blockSize = 1024;
 
 	int numBlocks = (N + blockSize - 1) / blockSize;
 
 	add<<<numBlocks, blockSize>>>(N, d_x, d_y);
+
+	cudaErrchk( cudaPeekAtLastError() );
 
 	// cudaDeviceSynchronize();	
 	cudaMemcpy(h_y, d_y, size, cudaMemcpyDeviceToHost);
