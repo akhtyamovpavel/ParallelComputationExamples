@@ -4,9 +4,9 @@ __global__ void Reduce(int* in_data, int* out_data) {
     extern __shared__ int shared_data[];
 
     unsigned int tid = threadIdx.x;
-    unsigned int index = blockIdx.x * blockDim.x * 4 + threadIdx.x;
+    unsigned int index = blockIdx.x * blockDim.x * 2 + threadIdx.x;
 
-    shared_data[tid] = in_data[index] + in_data[index + blockDim.x] + in_data[index + blockDim.x * 2] + in_data[index + blockDim.x * 3];
+    shared_data[tid] = in_data[index] + in_data[index + blockDim.x];
     __syncthreads();
     
     for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
@@ -23,10 +23,10 @@ __global__ void Reduce(int* in_data, int* out_data) {
 
 
 int main() {
-    const int block_size = 256;
+    const int block_size = 512;
     // __shared__ int shared_data[];
 
-    const int array_size = 1 << 22;
+    const int array_size = 1 << 20;
     int* h_array = new int[array_size];
     for (int i = 0; i < array_size; ++i) {
         h_array[i] = 1;
@@ -37,7 +37,7 @@ int main() {
 
     cudaMemcpy(d_array, h_array, sizeof(int) * array_size, cudaMemcpyHostToDevice);
 
-    int num_blocks = array_size / block_size / 4;
+    int num_blocks = array_size / block_size / 2;
 
     int* d_blocksum;
     cudaMalloc(&d_blocksum, sizeof(int) * num_blocks);

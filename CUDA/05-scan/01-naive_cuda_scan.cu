@@ -19,14 +19,8 @@ __global__ void Scan(int* in_data, int* out_data) {
     
     // shift = 2^(d - 1)
     for (unsigned int shift = 1; shift < blockDim.x; shift <<= 1 ) {
-        int tmp;
         if (tid >= shift) {
-            tmp = shared_data[tid - shift];
-        }
-
-        __syncthreads();
-        if (tid >= shift) {
-            shared_data[tid] += tmp;
+            shared_data[tid] += shared_data[tid - shift];
         }
 
         // shift = 1
@@ -35,15 +29,12 @@ __global__ void Scan(int* in_data, int* out_data) {
         // [1, 3, 5, 7] -> [1, 3, 1 + 5, 3 + 7] = [1, 3, 6, 10]
         __syncthreads();
     }
-    //if (blockIdx.x == 16383) {
-        //printf("%d %d %d\n", tid, shared_data[tid], index);
-        // std::cout << shared_data[tid] << std::endl;
-    //}
+    
     // block_idx = 0 -> [a0, a1, a2, a3]
     // block_idx = 1 -> [a4, a5, a6, a7]
     out_data[index] = shared_data[tid];
 
-    __syncthreads();
+    //__syncthreads();
 
     // out_data[block_idx == 0] = [1, 3, 6, 10]
 
@@ -53,7 +44,7 @@ __global__ void Scan(int* in_data, int* out_data) {
 
 
 int main() {
-    const int block_size = 1024;
+    const int block_size = 256;
 
     const int array_size = 1 << 22;
     int* h_array = new int[array_size];
@@ -61,7 +52,6 @@ int main() {
         h_array[i] = 1;
     }
 
-    // int* output = new int[array_size];
 
     int* d_array;
     cudaMalloc(&d_array, sizeof(int) * array_size);
