@@ -97,9 +97,9 @@ __global__ void Scan(int* in_data, int* out_data) {
 
 
 int main() {
-    const int block_size = 256;
+    const int block_size = 1024;
 
-    const int array_size = 1 << 22;
+    const int array_size = 1 << 20;
     int* h_array = new int[array_size];
     for (int i = 0; i < array_size; ++i) {
         h_array[i] = 1;

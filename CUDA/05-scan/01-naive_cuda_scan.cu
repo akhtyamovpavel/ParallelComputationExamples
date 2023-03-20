@@ -44,9 +44,9 @@ __global__ void Scan(int* in_data, int* out_data) {
 
 
 int main() {
-    const int block_size = 256;
+    const int block_size = 1024;
 
-    const int array_size = 1 << 22;
+    const int array_size = 1 << 20;
     int* h_array = new int[array_size];
     for (int i = 0; i < array_size; ++i) {
         h_array[i] = 1;
@@ -89,7 +89,9 @@ int main() {
 
     std::cout << milliseconds << " elapsed" << std::endl;
 
-    std::cout << h_localscan[array_size - 1] << std::endl;
+    for (int i = 0; i < 1024; ++i) {
+        std::cout << h_localscan[i] << std::endl;
+    }
 
     delete[] h_array;
     delete[] h_localscan;
