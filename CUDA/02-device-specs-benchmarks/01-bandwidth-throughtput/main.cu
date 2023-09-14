@@ -12,7 +12,7 @@ void add(int n, float* x, float* y) {
 
 
 int main() {
-	int N = 1 << 20;
+	int N = 1 << 28;
 	size_t size = N * sizeof(float);
 	float *x = (float*)malloc(size);
 	float *y = (float*)malloc(size);
@@ -59,7 +59,8 @@ int main() {
 
     std::cout << milliseconds << " elapsed" << std::endl;
 
-    float numBytes = N * 8;
+    float numBytes = N * 4;
+    std::cout << numBytes << " " << milliseconds << std::endl;
     float operationsByThread = 3; // read x + read y + write y
     float bandwidth = numBytes * operationsByThread / 1e6 / milliseconds;
 

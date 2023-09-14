@@ -1,56 +1,43 @@
 #include <iostream>
 
-__device__ void WarpReduce(volatile int* shared_data, int tid) {
-    shared_data[tid] += shared_data[tid + 32];
-    shared_data[tid] += shared_data[tid + 16];
-    shared_data[tid] += shared_data[tid + 8];
-    shared_data[tid] += shared_data[tid + 4];
-    shared_data[tid] += shared_data[tid + 2];
-    shared_data[tid] += shared_data[tid + 1];
-}
-
-__global__ void Reduce(int* in_data, int* out_data) {
-    extern __shared__ int shared_data[];
-
+__global__ void Reduce(int* in_data, int* tmp_data, int* out_data) {
     unsigned int tid = threadIdx.x;
-    unsigned int index = blockIdx.x * blockDim.x * 2 + threadIdx.x;
+    unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
 
-    shared_data[tid] = in_data[index] + in_data[index + blockDim.x];
-    __syncthreads();
-    
-    for (unsigned int s = blockDim.x / 2; s > 32; s >>= 1) {
-        if (tid < s) {
-            shared_data[tid] += shared_data[tid + s];
+    tmp_data[index] = in_data[index];
+
+    // __syncthreads();    
+    for (unsigned int s = 1; s < blockDim.x; s *= 2) {
+        if (tid % (2 * s) == 0) {
+            tmp_data[index] += tmp_data[index + s];
         }
-        __syncthreads();
+        // __syncthreads();
     }
 
-    if (tid < 32) {
-        WarpReduce(shared_data, tid);
-    }
-    
     if (tid == 0) {
-        out_data[blockIdx.x] = shared_data[0];
+        out_data[blockIdx.x] = tmp_data[index];
     }
 }
 
 
 int main() {
-    const int block_size = 512;
+    const int block_size = 256;
     // __shared__ int shared_data[];
 
-    const int array_size = 1 << 20;
+    const int array_size = 1 << 22;
     int* h_array = new int[array_size];
     for (int i = 0; i < array_size; ++i) {
         h_array[i] = 1;
     }
 
     int* d_array;
+    int* tmp_array;
     cudaMalloc(&d_array, sizeof(int) * array_size);
+    cudaMalloc(&tmp_array, sizeof(int) * array_size);
 
     cudaMemcpy(d_array, h_array, sizeof(int) * array_size, cudaMemcpyHostToDevice);
 
-    int num_blocks = array_size / block_size / 2;
+    int num_blocks = array_size / block_size;
 
     int* d_blocksum;
     cudaMalloc(&d_blocksum, sizeof(int) * num_blocks);
@@ -66,7 +53,7 @@ int main() {
 
     cudaEventRecord(start);
 
-    Reduce<<<num_blocks, block_size, sizeof(int) * block_size>>>(d_array, d_blocksum);
+    Reduce<<<num_blocks, block_size, sizeof(int) * block_size>>>(d_array, tmp_array, d_blocksum);
 
     cudaEventRecord(stop);
 

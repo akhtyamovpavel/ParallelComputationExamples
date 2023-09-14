@@ -10,7 +10,7 @@ int main() {
     float* h_x = new float[array_size];
 
     for (int i = 0; i < array_size; ++i) {
-        h_x[i] = i * 1.0f;
+        h_x[i] = i * 2.0f;
     }
 
     float* d_x;
@@ -28,8 +28,11 @@ int main() {
     );
     int result;
 
-    stat = cublasIsamax(handle, array_size, d_x, 3, &result);
+    stat = cublasIsamax(handle, array_size / 3, d_x, 3, &result);
+    
+    int index = (result - 1) * 3;
 
+    std::cout << index << " " << h_x[index] << std::endl;
     // 0, 3, 6, 9, ...
     // 1, 2, 3, 4, 5, ...
     // max element located at (1398102 - 1) * 3

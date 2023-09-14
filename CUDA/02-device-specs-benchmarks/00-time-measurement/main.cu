@@ -49,14 +49,15 @@ int main() {
 	add<<<numBlocks, blockSize>>>(N, d_x, d_y);
 
     cudaEventRecord(stop);
-
-	cudaMemcpy(y, d_y, size, cudaMemcpyDeviceToHost);
-
-    cudaEventSynchronize(stop);
-    
-    float milliseconds = 0;
+	float milliseconds = 0;
 
     cudaEventElapsedTime(&milliseconds, start, stop);
+
+	cudaMemcpy(y, d_y, size, cudaMemcpyDeviceToHost);
+    // cudaEventRecord(stop);
+    // cudaEventSynchronize(stop);
+    
+    
 
     std::cout << milliseconds << " elapsed" << std::endl;
 

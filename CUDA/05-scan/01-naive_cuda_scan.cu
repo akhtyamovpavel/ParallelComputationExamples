@@ -19,75 +19,22 @@ __global__ void Scan(int* in_data, int* out_data) {
     
     // shift = 2^(d - 1)
     for (unsigned int shift = 1; shift < blockDim.x; shift <<= 1 ) {
-        int ai = shift * (2 * tid + 1) - 1; 
-        // tid = 0, shift = 1, ai = 0; bi = 1; 
-        // tid = 16, shift = 1, ai = 32 = 0; bi = 33 = 1;
-        int bi = shift * (2 * tid + 2) - 1;
-
-        if (bi < blockDim.x) {
-            shared_data[bi] += shared_data[ai];
+        if (tid >= shift) {
+            shared_data[tid] += shared_data[tid - shift];
         }
 
+        // shift = 1
+        // [1, 2, 3, 4] -> [1, 1 + 2, 2 + 3, 3 + 4] = [1, 3, 5, 7]
+        // shift = 2
+        // [1, 3, 5, 7] -> [1, 3, 1 + 5, 3 + 7] = [1, 3, 6, 10]
         __syncthreads();
     }
-
-    if (tid == blockDim.x  - 1) {
-        shared_data[tid] = 0;
-    }
-
-    __syncthreads();
-
-    int temp;
-    for (unsigned int shift = blockDim.x / 2; shift > 0; shift >>= 1) {
-        int i = 2 * shift * (tid  + 1) - 1;
-        if (i < blockDim.x) {
-            temp = shared_data[i - shift]; // blue in temp
-
-            // temp = 4
-            shared_data[i - shift] = shared_data[i]; // orange
-
-            // 1 2 1 0 1 2 1 0 // temp = 4
-            shared_data[i] = temp + shared_data[i];
-        }
-        __syncthreads();
-
-        // step 2
-        // 1 2 1 0 1 2 1 4
-        // tid == 3
-        // temp = 2
-        // 1 0 1 0 1 2 1 4
-        // 1 0 1 2 1 2 1 4
-        // tid == 7
-        // temp = 2
-        // 1 0 1 2 1 4 1 4
-        // 1 0 1 2 1 4 1 6
-
-        // tid == 1
-        // temp = 0
-        // 0 1 1 2 1 4 1 6
-        // 0 1 1 2 1 4 1 6
-        // tid == 3
-        // temp = 1
-        // 0 1 2 2 1 4 1 6
-        // 0 1 2 3 1 4 1 6
-        // tid == 5
-        // temp = 1
-        // 0 1 2 3 4 4 1 6
-        // 0 1 2 3 4 5 1 6
-        // tid == 7
-        // temp = 1
-        // 0 1 2 3 4 5 6 6
-        // 0 1 2 3 4 5 6 7
-    }
-    // if (blockIdx.x == 16383) {
-    //     printf("%d %d %d\n", tid, shared_data[tid], index);
-    //     // std::cout << shared_data[tid] << std::endl;
-    // }
+    
     // block_idx = 0 -> [a0, a1, a2, a3]
     // block_idx = 1 -> [a4, a5, a6, a7]
     out_data[index] = shared_data[tid];
 
-    __syncthreads();
+    //__syncthreads();
 
     // out_data[block_idx == 0] = [1, 3, 6, 10]
 
@@ -97,15 +44,14 @@ __global__ void Scan(int* in_data, int* out_data) {
 
 
 int main() {
-    const int block_size = 256;
+    const int block_size = 1024;
 
-    const int array_size = 1 << 22;
+    const int array_size = 1 << 20;
     int* h_array = new int[array_size];
     for (int i = 0; i < array_size; ++i) {
         h_array[i] = 1;
     }
 
-    // int* output = new int[array_size];
 
     int* d_array;
     cudaMalloc(&d_array, sizeof(int) * array_size);
@@ -143,7 +89,9 @@ int main() {
 
     std::cout << milliseconds << " elapsed" << std::endl;
 
-    std::cout << h_localscan[array_size - 1] << std::endl;
+    for (int i = 0; i < 1024; ++i) {
+        std::cout << h_localscan[i] << std::endl;
+    }
 
     delete[] h_array;
     delete[] h_localscan;

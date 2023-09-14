@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  node1-seed:
+    image: cassandra
+    networks: 
+      - cassandra
+  node2:
+    image: cassandra
+    networks: 
+      - cassandra
+    environment:
+      - CASSANDRA_SEEDS=node1-seed
+
+
+networks:
+  cassandra:
