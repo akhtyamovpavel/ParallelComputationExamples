@@ -28,7 +28,7 @@ int main() {
     const int block_size = 1024;
     // __shared__ int shared_data[];
 
-    const int array_size = 1 << 20;
+    const int array_size = 1 << 28;
     int* h_array = new int[array_size];
     for (int i = 0; i < array_size; ++i) {
         h_array[i] = 1;

@@ -14,30 +14,12 @@ __global__ void ComputeThreeSum(int n, int* input, int* result) {
     } else if (local_tid == blockDim.x - 1 && tid + 1 < n) {
         s_data[BLOCKSIZE + 1] = input[tid + 1];
     }
-
-    // 0 1 2 3 4
-
-    // int tmp = 0;
     s_data[local_tid + 1] = input[tid]; // copy data to shared memory
     
     __syncthreads();
 
     result[tid] = s_data[local_tid] + s_data[local_tid + 1] + s_data[local_tid + 2]; 
 
-    // if (local_tid > 0) {
-    //     tmp = s_data[local_tid - 1];
-    // } else if (tid > 0) {
-    //     tmp = input[tid - 1];
-    // }
-
-    // if (local_tid + 1 < BLOCKSIZE) {
-    //     tmp = tmp + s_data[local_tid + 1];
-    // } else if (tid + 1 < n) {
-    //     tmp = tmp + input[tid + 1];    
-    // }
-
-    // tmp = tmp + s_data[local_tid];
-    // result[tid] = tmp;
 }
 
 

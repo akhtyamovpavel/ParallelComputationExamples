@@ -24,15 +24,19 @@ int GetBlockSize() {
 __global__ void MatMulKernel(Matrix *A, Matrix *B, Matrix *C);
 
 void MatMul(Matrix* A, Matrix* B, Matrix* C) {
-	Matrix d_A;
-	d_A.width = A->width;
-    d_A.height = A->height;
+	Matrix* d_A;
+    cudaMalloc(&d_A, sizeof(Matrix));
+
+    
+
 
     size_t size = A->width * A->height * sizeof(float);
 
-    cudaMalloc(&d_A.elements, size);
+    cudaMalloc(&d_A->elements, size);
 
-    cudaMemcpy(d_A.elements, A->elements, size, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_A, A, sizeof(Matrix), cudaMemcpyHostToDevice);
+
+    cudaMemcpy(d_A->elements, A->elements, size, cudaMemcpyHostToDevice);
 	
     Matrix d_B;
     d_B.width = B->width;
@@ -62,7 +66,7 @@ void MatMul(Matrix* A, Matrix* B, Matrix* C) {
     cudaEventCreate(&stop);
 
     cudaEventRecord(start);
-    MatMulKernel<<<dim_grid, dim_block>>>(&d_A, &d_B, &d_C);
+    MatMulKernel<<<dim_grid, dim_block>>>(d_A, &d_B, &d_C);
     float milliseconds = 0;
 
     cudaEventRecord(stop);
@@ -72,7 +76,7 @@ void MatMul(Matrix* A, Matrix* B, Matrix* C) {
     cudaEventElapsedTime(&milliseconds, start, stop); 
     std::cout << "Calculation in " << milliseconds << std::endl;
 
-    cudaFree(d_A.elements);
+    cudaFree(d_A->elements);
     cudaFree(d_B.elements);
     cudaFree(d_C.elements);
 }
@@ -84,7 +88,7 @@ __global__ void MatMulKernel(Matrix *A, Matrix *B, Matrix *C) {
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int column = blockIdx.x * blockDim.x + threadIdx.x;
 
-    printf("%d, %d, %d\n", row, column, A->width);
+    printf("%d, %d %d\n", row, column, A->width);
 
     for (int index = 0; index < A->width; ++index) {
         value += A->elements[row * A->width + index] * B->elements[index * B->width + column];
@@ -120,9 +124,9 @@ void FreeMatrix(Matrix* matrix) {
 }
 
 int main(int argc, char** argv) {
-    Matrix *A = CreateMatrix(32);
-    Matrix *B = CreateMatrix(32);
-    Matrix *C = CreateMatrix(32);
+    Matrix *A = CreateMatrix(128);
+    Matrix *B = CreateMatrix(128);
+    Matrix *C = CreateMatrix(128);
 
     MatMul(A, B, C);
     

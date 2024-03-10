@@ -46,14 +46,18 @@ int main() {
 
 
     cudaEventRecord(start);
-	add<<<numBlocks, blockSize>>>(N, d_x, d_y);
+	for (int i = 0; i < 10; ++i) {
+		add<<<numBlocks, blockSize>>>(N, d_x, d_y);
+	}
 
     cudaEventRecord(stop);
+	cudaEventSynchronize(stop);
 	float milliseconds = 0;
 
-    cudaEventElapsedTime(&milliseconds, start, stop);
-
+	cudaEventElapsedTime(&milliseconds, start, stop);
 	cudaMemcpy(y, d_y, size, cudaMemcpyDeviceToHost);
+	
+    // cudaEventElapsedTime(&milliseconds, start, stop);
     // cudaEventRecord(stop);
     // cudaEventSynchronize(stop);
     

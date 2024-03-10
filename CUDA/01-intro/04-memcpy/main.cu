@@ -15,8 +15,8 @@ __global__
 void add(int n, float* x, float* y) {
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
 	if (index < n) {
-		y[index] = 1 + 2;
-	}	
+		y[index] = x[index] + y[index];
+	}
 }
 
 
@@ -41,13 +41,13 @@ int main() {
 	cudaMemcpy(d_x, h_x, size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_y, h_y, size, cudaMemcpyHostToDevice);
 
-	int blockSize = 1024;
+	int blockSize = 256;
 
 	int numBlocks = (N + blockSize - 1) / blockSize;
 
 	add<<<numBlocks, blockSize>>>(N, d_x, d_y);
 
-	cudaErrchk( cudaPeekAtLastError() );
+	// cudaErrchk( cudaPeekAtLastError() );
 
 	// cudaDeviceSynchronize();	
 	cudaMemcpy(h_y, d_y, size, cudaMemcpyDeviceToHost);

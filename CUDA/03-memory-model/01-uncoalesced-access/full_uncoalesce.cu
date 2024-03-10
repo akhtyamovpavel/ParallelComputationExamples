@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cstdio>
 
-#define ILP 8
+#define ILP 16
 
 __global__
 void add(int n, float* x, float* y, float* z) {

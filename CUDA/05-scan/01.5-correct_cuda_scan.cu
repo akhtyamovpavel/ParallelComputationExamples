@@ -95,8 +95,9 @@ int main() {
     std::cout << milliseconds << " elapsed" << std::endl;
 
     for (int i = 1024; i < 2048; ++i) {
-        std::cout << h_localscan[i] << std::endl;
+        std::cout << h_localscan[i] << " ";
     }
+    std::cout << std::endl;
 
     delete[] h_array;
     delete[] h_localscan;

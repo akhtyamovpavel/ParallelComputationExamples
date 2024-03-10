@@ -39,7 +39,7 @@ int main() {
     const int block_size = 512;
     // __shared__ int shared_data[];
 
-    const int array_size = 1 << 20;
+    const int array_size = 1 << 28;
     int* h_array = new int[array_size];
     for (int i = 0; i < array_size; ++i) {
         h_array[i] = 1;
@@ -65,8 +65,11 @@ int main() {
 
 
     cudaEventRecord(start);
+    cudaStream_t stream;
 
-    Reduce<<<num_blocks, block_size, sizeof(int) * block_size>>>(d_array, d_blocksum);
+    cudaStreamCreate(&stream);
+
+    Reduce<<<num_blocks, block_size, sizeof(int) * block_size, stream>>>(d_array, d_blocksum);
 
     cudaEventRecord(stop);
 

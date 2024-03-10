@@ -18,15 +18,27 @@ __global__ void Scan(int* in_data, int* out_data, int* blockSums) {
     __syncthreads();
     
     // shift = 2^(d - 1)
+    // int step_cnt = 0;
+    // int offset = 0;
+    int prev_offset = blockDim.x;
     for (unsigned int shift = 1; shift < blockDim.x; shift <<= 1 ) {
+        int offset = (step_cnt % 2 == 0) ? 0 : blockDim.x;
+        int prev_offset = blockDim.x - offset;
+        
+        // printf("%d %d %d\n", offset, prev_offset, index);
+        // shared_data[tid + blockDim.x] = int(tid >= shift) * shared_data[tid - shift] + shared_data[tid];
+
         if (tid >= shift) {
-            shared_data[tid + blockDim.x] = shared_data[tid - shift] + shared_data[tid];
+            shared_data[tid + prev_offset] = shared_data[tid - shift + offset] + shared_data[tid + offset];
+        } else {
+            shared_data[tid + prev_offset] = shared_data[tid + offset];
         }
         __syncthreads();
-        if (tid >= shift) {
-            shared_data[tid] = shared_data[tid + blockDim.x];
-        }
-        __syncthreads();
+        step_cnt++;
+        // // if (tid >= shift) {
+        //     shared_data[tid] = shared_data[tid + blockDim.x];
+        // // }
+        // __syncthreads();
 
         // shift = 1
         // [1, 2, 3, 4] -> [1, 1 + 2, 2 + 3, 3 + 4] = [1, 3, 5, 7]
@@ -65,7 +77,6 @@ int main() {
     const int block_size = 1024;
 
     const int array_size = 1 << 20;
-    int* h_array;
     // cudaMallocHost(&h_array, sizeof(int) * array_size);
     int* h_array = new int[array_size];
     for (int i = 0; i < array_size; ++i) {
