@@ -1,3 +1,3 @@
 #!/bin/bash
-module add mpi/openmpi4-x86_64
-mpiexec ./MpiHelloWorld
+sbcast -f ./MpiHelloWorld /home/$USER/MpiHelloWorld
+mpiexec /home/$USER/MpiHelloWorld
