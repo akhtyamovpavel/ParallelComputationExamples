@@ -1,2 +1,8 @@
 #!/bin/bash
-/usr/lib64/openmpi/bin/mpirun --map-by ppr:1:node ./MpiProbe
+#SBATCH --ntasks=2
+#SBATCH --cpus-per-task=1
+
+executable=$1
+sbcast -f $executable $PWD/$executable
+
+mpiexec ./$executable
