@@ -7,4 +7,4 @@ project(MpiHelloWorld)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${MpiHelloWorld_SOURCE_DIR}/bin)
 
-add_executable(MpiHelloWorld main.cpp)
+add_executable(MpiPingPong main.cpp)

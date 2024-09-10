@@ -1,2 +1,7 @@
 #!/bin/bash
-/usr/lib64/openmpi/bin/mpirun --map-by ppr:1:node ./MpiHelloWorld
+#SBATCH --ntasks=2
+#SBATCH --cpus-per-task=1
+
+sbcast -f MpiPingPong $PWD/MpiPingPong
+
+mpiexec ./MpiPingPong
