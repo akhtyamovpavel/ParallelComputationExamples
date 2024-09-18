@@ -11,6 +11,11 @@ int main(int argc, char** argv) {
 
 	int world_size;
 	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+	char processor_name[MPI_MAX_PROCESSOR_NAME];
+
+	int name_length;
+	MPI_Get_processor_name(processor_name, &name_length);
+	std::cout << rank << " " << processor_name << std::endl;
 
 	if (rank == 0) {
 		int num_tasks = 100;
@@ -25,19 +30,21 @@ int main(int argc, char** argv) {
 		for (int i = 0; i < num_tasks * (world_size - 1); ++i) {
 			int flag;
 			MPI_Request request;
-			MPI_Irecv(&flag, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &request);
+			MPI_Irecv(&flag, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &request);
 			MPI_Status status;
 			MPI_Wait(&request, &status);
+			if (status.MPI_TAG == 1) {
             
-            counts[status.MPI_SOURCE]++;
+				counts[status.MPI_SOURCE]++;
 
-            if (i % 25 == 24) {
-			    std::cout << i + 1 << " tasks completed " << std::endl;
-                for (int j = 1; j < world_size; ++j) {
-                    std::cout << counts[j] << " ";
-                }
-                std::cout << std::endl;
-            }
+				if (i % 25 == 24) {
+					std::cout << i + 1 << " tasks completed " << std::endl;
+					for (int j = 1; j < world_size; ++j) {
+						std::cout << counts[j] << " ";
+					}
+					std::cout << std::endl;
+				}
+			}
 		}
 	} else {
 		int num_tasks;
@@ -46,7 +53,7 @@ int main(int argc, char** argv) {
             // usleep(100000);
 			int completed = 1;
 			MPI_Request request;
-			MPI_Isend(&completed, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &request);
+			MPI_Isend(&completed, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &request);
 		}
 	}
 	
