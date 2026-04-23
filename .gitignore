@@ -1,2 +1,18 @@
 *build*
 *.out
+
+# Скомпилированные MPI-бинарники (рядом с run*.sh в bin/ каждого примера)
+MPI/00-hello-world/bin/MpiHelloWorld
+MPI/01-send_recv/bin/MpiSendRecv
+MPI/02-ping-pong/bin/MpiPingPong
+MPI/03-probe-message-status/bin/MpiProbe
+MPI/03-probe-message-status/bin/MpiWithoutProbe
+MPI/04-isend-irecv/bin/MpiIsendRecv
+MPI/05-bcast/bin/MpiBcast
+MPI/06-scatter-gather/bin/MpiScatterGather
+MPI/07-reduce-allreduce/bin/MpiReduceAllreduce
+MPI/08-alltoall/bin/MpiAlltoall
+MPI/09-collective-benchmark/bin/MpiCollectiveBenchmark
+
+# Скомпилированные OpenMP-бинарники (рядом с исходниками, без расширения)
+OpenMP/00-hello-world/main
