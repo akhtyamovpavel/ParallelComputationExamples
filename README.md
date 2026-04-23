@@ -9,6 +9,15 @@
 * [`02-ping-pong`](/MPI/02-ping-pong) - Пример обмена сообщениями между процессами (задача "Пинг-понг")
 * [`03-probe-message-status`](/MPI/03-probe-message-status) - Примеры использования Probe и получения статуса сообщений
 * [`04-isend-irecv`](/MPI/04-isend-irecv) - Примеры неблокирующих операций ISend/IRecv
+* [`05-bcast`](/MPI/05-bcast) - Коллективная рассылка `MPI_Bcast` и её ручные реализации (линейная и по биномиальному дереву)
+* [`06-scatter-gather`](/MPI/06-scatter-gather) - Коллективы `MPI_Scatter`/`MPI_Gather` и их ручные аналоги на Send/Recv
+* [`07-reduce-allreduce`](/MPI/07-reduce-allreduce) - Редукции `MPI_Reduce`/`MPI_Allreduce` и ручная редукция по биномиальному дереву
+* [`08-alltoall`](/MPI/08-alltoall) - Обмен «все-со-всеми» `MPI_Alltoall` и ручная реализация через `MPI_Sendrecv`
+* [`09-collective-benchmark`](/MPI/09-collective-benchmark) - Сводный бенчмарк коллективных операций с выводом в CSV
+* [`10-comm-split`](/MPI/10-comm-split) - Разбиение коммуникатора через `MPI_Comm_split` (чётные vs нечётные)
+* [`11-comm-dup`](/MPI/11-comm-dup) - `MPI_Comm_dup`: независимый «канал» для библиотек, изоляция тегов
+* [`12-comm-group`](/MPI/12-comm-group) - Группы рангов через `MPI_Group_incl` и `MPI_Comm_create_group`
+* [`13-comm-cart`](/MPI/13-comm-cart) - Декартова 2D-топология: `MPI_Cart_create`, координаты и соседи через `MPI_Cart_shift`
 
 ### OpenMP
 * [`00-hello-world`](/OpenMP/00-hello-world) - Базовый пример с использованием OpenMP

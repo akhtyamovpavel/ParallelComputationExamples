@@ -1,6 +1,7 @@
 #include <mpi.h>
-#include <cstdio>
 #include <cstdlib>
+#include <iomanip>
+#include <iostream>
 #include <vector>
 
 // Линейный broadcast: root последовательно отправляет сообщение каждому
@@ -12,7 +13,9 @@ static void linear_bcast(void* buf, int count, MPI_Datatype dt,
     MPI_Comm_rank(comm, &rank);
     if (rank == root) {
         for (int r = 0; r < size; ++r) {
-            if (r == root) continue;
+            if (r == root) {
+                continue;
+            }
             MPI_Send(buf, count, dt, r, 0, comm);
         }
     } else {
@@ -56,20 +59,29 @@ static void bench(const char* name, bcast_fn fn,
                   std::vector<int>& buf, int iters) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 5; ++i) {
         fn(buf.data(), buf.size(), MPI_INT, 0, MPI_COMM_WORLD);
+    }
     MPI_Barrier(MPI_COMM_WORLD);
     double t0 = MPI_Wtime();
-    for (int i = 0; i < iters; ++i)
+    for (int i = 0; i < iters; ++i) {
         fn(buf.data(), buf.size(), MPI_INT, 0, MPI_COMM_WORLD);
+    }
     double t1 = MPI_Wtime();
-    double local = (t1 - t0) / iters, worst;
+    double local = (t1 - t0) / iters;
+    double worst = 0.0;
     MPI_Reduce(&local, &worst, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
     if (rank == 0) {
-        double bytes = buf.size() * (double)sizeof(int);
-        printf("%-12s bytes=%-10.0f time=%8.3f ms  bw=%7.2f MB/s\n",
-               name, bytes, worst * 1e3,
-               bytes / worst / (1024.0 * 1024.0));
+        double bytes = buf.size() * static_cast<double>(sizeof(int));
+        std::cout << std::left << std::setw(12) << name
+                  << " bytes=" << std::left << std::setw(10)
+                  << std::fixed << std::setprecision(0) << bytes
+                  << " time=" << std::right << std::setw(8)
+                  << std::fixed << std::setprecision(3) << worst * 1e3 << " ms"
+                  << "  bw=" << std::right << std::setw(7)
+                  << std::fixed << std::setprecision(2)
+                  << bytes / worst / (1024.0 * 1024.0) << " MB/s"
+                  << std::endl;
     }
 }
 
@@ -83,9 +95,12 @@ int main(int argc, char** argv) {
 
     std::vector<int> buf(count);
     if (rank == 0) {
-        for (int i = 0; i < count; ++i) buf[i] = i;
-        printf("=== Bcast: MPI_Bcast vs linear vs tree ===\n");
-        printf("ranks=%d count=%d iters=%d\n", size, count, iters);
+        for (int i = 0; i < count; ++i) {
+            buf[i] = i;
+        }
+        std::cout << "=== Bcast: MPI_Bcast vs linear vs tree ===" << std::endl;
+        std::cout << "ranks=" << size << " count=" << count
+                  << " iters=" << iters << std::endl;
     }
 
     bench("MPI_Bcast", wrap_mpi_bcast, buf, iters);

@@ -13,6 +13,10 @@ MPI/06-scatter-gather/bin/MpiScatterGather
 MPI/07-reduce-allreduce/bin/MpiReduceAllreduce
 MPI/08-alltoall/bin/MpiAlltoall
 MPI/09-collective-benchmark/bin/MpiCollectiveBenchmark
+MPI/10-comm-split/bin/MpiCommSplit
+MPI/11-comm-dup/bin/MpiCommDup
+MPI/12-comm-group/bin/MpiCommGroup
+MPI/13-comm-cart/bin/MpiCommCart
 
 # Скомпилированные OpenMP-бинарники (рядом с исходниками, без расширения)
 OpenMP/00-hello-world/main

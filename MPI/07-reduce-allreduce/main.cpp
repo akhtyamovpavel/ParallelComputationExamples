@@ -1,6 +1,7 @@
 #include <mpi.h>
-#include <cstdio>
 #include <cstdlib>
+#include <iomanip>
+#include <iostream>
 #include <vector>
 
 // Ручная редукция по биномиальному дереву к root (суммирование).
@@ -22,7 +23,9 @@ static void tree_reduce_sum(const double* sendbuf, double* recvbuf,
             if (peer < size) {
                 MPI_Recv(tmp.data(), count, MPI_DOUBLE,
                          (peer + root) % size, 0, comm, MPI_STATUS_IGNORE);
-                for (int i = 0; i < count; ++i) work[i] += tmp[i];
+                for (int i = 0; i < count; ++i) {
+                    work[i] += tmp[i];
+                }
             }
         } else {
             int dst_v = vrank & ~mask;
@@ -33,22 +36,34 @@ static void tree_reduce_sum(const double* sendbuf, double* recvbuf,
         mask <<= 1;
     }
     if (rank == root) {
-        for (int i = 0; i < count; ++i) recvbuf[i] = work[i];
+        for (int i = 0; i < count; ++i) {
+            recvbuf[i] = work[i];
+        }
     }
 }
 
 template <typename F>
 static void bench(const char* name, int rank, int iters, double bytes, F fn) {
-    for (int i = 0; i < 3; ++i) fn();
+    for (int i = 0; i < 3; ++i) {
+        fn();
+    }
     MPI_Barrier(MPI_COMM_WORLD);
     double t0 = MPI_Wtime();
-    for (int i = 0; i < iters; ++i) fn();
+    for (int i = 0; i < iters; ++i) {
+        fn();
+    }
     double t1 = MPI_Wtime();
-    double local = (t1 - t0) / iters, worst;
+    double local = (t1 - t0) / iters;
+    double worst = 0.0;
     MPI_Reduce(&local, &worst, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
     if (rank == 0) {
-        printf("%-20s time=%8.3f ms  bw=%7.2f MB/s\n", name,
-               worst * 1e3, bytes / worst / (1024.0 * 1024.0));
+        std::cout << std::left << std::setw(20) << name
+                  << " time=" << std::right << std::setw(8)
+                  << std::fixed << std::setprecision(3) << worst * 1e3 << " ms"
+                  << "  bw=" << std::right << std::setw(7)
+                  << std::fixed << std::setprecision(2)
+                  << bytes / worst / (1024.0 * 1024.0) << " MB/s"
+                  << std::endl;
     }
 }
 
@@ -62,13 +77,15 @@ int main(int argc, char** argv) {
     int iters = (argc > 2) ? atoi(argv[2]) : 50;
 
     // У каждого ранга свой вектор [1+rank, 1+rank, ...] — легко проверить сумму.
-    std::vector<double> local(count, 1.0 + rank), result(count, 0.0);
+    std::vector<double> local(count, 1.0 + rank);
+    std::vector<double> result(count, 0.0);
 
     if (rank == 0) {
-        printf("=== Reduce / Allreduce, count=%d, ranks=%d ===\n", count, size);
+        std::cout << "=== Reduce / Allreduce, count=" << count
+                  << ", ranks=" << size << " ===" << std::endl;
     }
 
-    double bytes = count * (double)sizeof(double);
+    double bytes = count * static_cast<double>(sizeof(double));
 
     bench("MPI_Reduce", rank, iters, bytes, [&] {
         MPI_Reduce(local.data(), result.data(), count, MPI_DOUBLE,
@@ -84,9 +101,13 @@ int main(int argc, char** argv) {
 
     // Проверка корректности после Allreduce (у всех тот же результат)
     double expected = 0.0;
-    for (int r = 0; r < size; ++r) expected += 1.0 + r;
+    for (int r = 0; r < size; ++r) {
+        expected += 1.0 + r;
+    }
     if (rank == 0) {
-        printf("result[0] = %.1f (ожидается %.1f)\n", result[0], expected);
+        std::cout << "result[0] = "
+                  << std::fixed << std::setprecision(1) << result[0]
+                  << " (ожидается " << expected << ")" << std::endl;
     }
 
     MPI_Finalize();
