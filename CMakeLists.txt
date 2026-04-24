@@ -5,6 +5,7 @@ project(ParallelComputationExamples)
 option(BUILD_MPI_EXAMPLES "Build MPI examples" ON)
 option(BUILD_OPENMP_EXAMPLES "Build OpenMP examples" ON)
 option(BUILD_CUDA_EXAMPLES "Build CUDA examples" OFF)
+option(BUILD_OPENCL_EXAMPLES "Build OpenCL examples" OFF)
 
 # Добавляем подпроекты
 if(BUILD_MPI_EXAMPLES)
@@ -17,4 +18,8 @@ endif()
 
 if(BUILD_CUDA_EXAMPLES)
     add_subdirectory(CUDA)
+endif()
+
+if(BUILD_OPENCL_EXAMPLES)
+    add_subdirectory(OpenCL)
 endif()

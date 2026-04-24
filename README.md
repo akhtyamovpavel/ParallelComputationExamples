@@ -1,5 +1,5 @@
 # ParallelComputationExamples
-Примеры кодов с MPI, OpenMP и CUDA. Код собран при помощи CMake.
+Примеры кодов с MPI, OpenMP, CUDA и OpenCL. Код собран при помощи CMake.
 
 ## Структура проекта
 
@@ -35,10 +35,27 @@
 * [`03-memory-model`](/CUDA/03-memory-model) - Модель памяти в CUDA
 * [`03.5-matrix-multiplication-example`](/CUDA/03.5-matrix-multiplication-example) - Пример умножения матриц на CUDA
 * [`04-reduction`](/CUDA/04-reduction) - Примеры редукции
+* [`04.5-atomics`](/CUDA/04.5-atomics) - Атомарные операции и построение гистограммы
+* [`04.7-warp-primitives`](/CUDA/04.7-warp-primitives) - Warp-уровневые примитивы: shuffle, reduce, vote
 * [`05-scan`](/CUDA/05-scan) - Примеры сканирования
 * [`06-cublas`](/CUDA/06-cublas) - Примеры использования библиотеки cuBLAS
 * [`07-pycuda`](/CUDA/07-pycuda) - Примеры использования PyCUDA
+* [`08-streams-events`](/CUDA/08-streams-events) - Потоки, события и перекрытие copy/compute
+* [`09-unified-memory`](/CUDA/09-unified-memory) - Unified memory: managed-указатели и prefetch
+* [`10-cooperative-groups`](/CUDA/10-cooperative-groups) - Cooperative groups: warp/block-группы и tiled_partition
+* [`11-cuda-graphs`](/CUDA/11-cuda-graphs) - CUDA Graphs: stream capture и explicit graph
+* [`12-thrust`](/CUDA/12-thrust) - Thrust: device_vector, transform_reduce, sort
+* [`13-curand`](/CUDA/13-curand) - cuRAND: host и device API на задаче Monte Carlo π
+* [`14-multi-gpu`](/CUDA/14-multi-gpu) - Multi-GPU: независимые устройства и peer access (≥ 2 GPU)
+* [`15-tensor-cores`](/CUDA/15-tensor-cores) - Tensor Cores / WMMA (FP16 × FP16 → FP32), требует sm_70+
+* [`16-dynamic-parallelism`](/CUDA/16-dynamic-parallelism) - Dynamic parallelism: запуск ядер из ядра (нужен -rdc=true)
+* [`17-cufft`](/CUDA/17-cufft) - cuFFT: 1D complex FFT (forward/inverse roundtrip)
+* [`18-cusparse`](/CUDA/18-cusparse) - cuSPARSE: SpMV на CSR-матрице (generic API)
 * [`tasks`](/CUDA/tasks) - Упражнения для выполнения
+
+### OpenCL
+* [`00-platform-device-info`](/OpenCL/00-platform-device-info) - Перечисление платформ и устройств OpenCL
+* [`01-intro`](/OpenCL/01-intro) - Введение в OpenCL (vector add)
 
 ### HadoopStackExamples
 * [`MapReduce`](/HadoopStackExamples/MapReduce) - Примеры MapReduce
@@ -49,7 +66,7 @@
 
 ## Сборка проекта
 
-Проект использует CMake для сборки примеров MPI и OpenMP. По умолчанию сборка CUDA-примеров отключена.
+Проект использует CMake для сборки примеров MPI и OpenMP. По умолчанию сборка CUDA- и OpenCL-примеров отключена — включается флагами `-DBUILD_CUDA_EXAMPLES=ON` / `-DBUILD_OPENCL_EXAMPLES=ON`.
 
 Для сборки проекта:
 ```bash
