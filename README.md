@@ -56,6 +56,25 @@
 ### OpenCL
 * [`00-platform-device-info`](/OpenCL/00-platform-device-info) - Перечисление платформ и устройств OpenCL
 * [`01-intro`](/OpenCL/01-intro) - Введение в OpenCL (vector add)
+* [`02-local-memory`](/OpenCL/02-local-memory) - Модель памяти: `__local` (аналог shared в CUDA), транспоз матрицы naive vs local
+* [`03-reduction`](/OpenCL/03-reduction) - Дерево редукции в `__local` памяти с `barrier(CLK_LOCAL_MEM_FENCE)`
+* [`04-matrix-multiplication`](/OpenCL/04-matrix-multiplication) - Наивное умножение матриц через глобальную память
+* [`05-profiling-events`](/OpenCL/05-profiling-events) - Профилирование: `cl_event` и `clGetEventProfilingInfo` (SAXPY)
+* [`06-image-objects`](/OpenCL/06-image-objects) - Image objects: `image2d_t`, `sampler_t`, Box Blur 3×3
+* [`07-multi-queue`](/OpenCL/07-multi-queue) - Несколько очередей: перекрытие copy/compute (аналог CUDA streams)
+* [`08-coalesced-access`](/OpenCL/08-coalesced-access) - Coalesced vs strided доступ к памяти, замер bandwidth
+* [`09-constant-memory`](/OpenCL/09-constant-memory) - `__constant` память: broadcast-оптимизация для read-only данных
+* [`10-pinned-memory`](/OpenCL/10-pinned-memory) - Pinned (mapped) память vs pageable: замер bandwidth H↔D
+* [`11-stencil`](/OpenCL/11-stencil) - 1D-стенсил с halo cells в `__local` памяти
+* [`12-atomics`](/OpenCL/12-atomics) - Атомарные операции: счётчик, наивная и приватизированная гистограмма
+* [`13-scan`](/OpenCL/13-scan) - Prefix sum (Hillis-Steele) внутри одного work-group
+* [`14-kernel-from-file`](/OpenCL/14-kernel-from-file) - Загрузка ядра из внешнего `.cl` файла
+* [`15-build-options`](/OpenCL/15-build-options) - Опции компиляции: `-cl-fast-relaxed-math`, `-cl-mad-enable`
+* [`16-offline-compilation`](/OpenCL/16-offline-compilation) - Кеширование скомпилированного бинарника ядра
+* [`17-sub-groups`](/OpenCL/17-sub-groups) - Sub-groups (аналог warp в CUDA): `sub_group_reduce_add()` (OpenCL 2.0+)
+* [`18-svm`](/OpenCL/18-svm) - Shared Virtual Memory: аналог CUDA Unified Memory (OpenCL 2.0+)
+* [`19-multi-device`](/OpenCL/19-multi-device) - Разделение работы между несколькими устройствами (CPU + GPU)
+* [`20-pyopencl`](/OpenCL/20-pyopencl) - PyOpenCL: Python-обёртка (аналог PyCUDA)
 
 ### HadoopStackExamples
 * [`MapReduce`](/HadoopStackExamples/MapReduce) - Примеры MapReduce

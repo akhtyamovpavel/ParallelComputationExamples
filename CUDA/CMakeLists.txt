@@ -80,6 +80,9 @@ add_cuda_example(03-memory-model/07-transpose/02-tiled-padded)
 add_cuda_example(03-memory-model/08-stencil/00-global)
 add_cuda_example(03-memory-model/08-stencil/01-shared-halo)
 
+add_cuda_example(03-memory-model/09-zero-copy)
+add_cuda_example(03-memory-model/10-bandwidth-comparison)
+
 add_cuda_example(03.5-matrix-multiplication-example)
 # Tiled matmul через shared memory — это ДЗ студентов (tasks/02-matrix-multiplication.md),
 # пример намеренно НЕ поставляется.
@@ -111,6 +114,7 @@ add_cuda_example_named(ScanCorrect        05-scan  01.5-correct_cuda_scan.cu)
 add_cuda_example_named(ScanRecursive      05-scan  01.75-recursive_cuda_scan.cu)
 add_cuda_example_named(ScanTwoLayer       05-scan  02-two-layer-parallelism.cu)
 add_cuda_example_named(ScanBankConflicts  05-scan  03-scan-bank-conflicts.cu)
+add_cuda_example_named(ScanWarpShuffle    05-scan  04-warp-scan.cu)
 
 # ----- 06-cublas (нужна линковка с cuBLAS) -----
 find_package(CUDAToolkit QUIET)
@@ -183,6 +187,24 @@ function(add_wmma_example subdir)
 endfunction()
 add_wmma_example(15-tensor-cores/00-wmma-16x16)
 add_wmma_example(15-tensor-cores/01-wmma-tiled)
+
+# ----- 19-profiling-tools (NVTX требует nvToolsExt из CUDAToolkit) -----
+find_package(CUDAToolkit QUIET)
+if(CUDAToolkit_FOUND AND TARGET CUDA::nvToolsExt)
+    function(add_nvtx_example subdir)
+        set(example_dir ${CMAKE_CURRENT_SOURCE_DIR}/${subdir})
+        string(REPLACE "/" "_" target "cuda_${subdir}")
+        string(REPLACE "." "_" target "${target}")
+        add_executable(${target} ${example_dir}/main.cu)
+        target_link_libraries(${target} PRIVATE CUDA::nvToolsExt)
+        set_target_properties(${target} PROPERTIES
+            OUTPUT_NAME main
+            RUNTIME_OUTPUT_DIRECTORY ${example_dir})
+    endfunction()
+    add_nvtx_example(19-profiling-tools/00-nvtx-ranges)
+else()
+    message(WARNING "CUDA::nvToolsExt не найден: 19-profiling-tools пропущены")
+endif()
 
 # ----- 13-curand / 17-cufft / 18-cusparse (все линкуются с тулкитовыми либами) -----
 # find_package(CUDAToolkit) уже вызывался выше для cuBLAS; повторный вызов

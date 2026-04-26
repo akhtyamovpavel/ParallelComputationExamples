@@ -1,5 +1,6 @@
 *build*
 *.out
+.vscode/
 
 # Скомпилированные MPI-бинарники (рядом с run*.sh в bin/ каждого примера)
 MPI/00-hello-world/bin/MpiHelloWorld
@@ -19,19 +20,38 @@ MPI/12-comm-group/bin/MpiCommGroup
 MPI/13-comm-cart/bin/MpiCommCart
 
 # Скомпилированные OpenMP-бинарники (рядом с исходниками, без расширения)
-OpenMP/00-hello-world/main
+OpenMP/**/main
+OpenMP/**/*.i
+OpenMP/**/*.s
 
 # Скомпилированные CUDA-бинарники (собираются прямо в директориях примеров).
 # Большинство примеров даёт бинарник `main` рядом с main.cu.
 CUDA/**/main
+
+# Промежуточные файлы nvcc (компиляция без --keep их обычно удаляет)
+CUDA/**/*.o
+CUDA/**/*.ptx
+CUDA/**/*.cubin
+CUDA/**/*.fatbin
+CUDA/**/*.fatbin.c
+CUDA/**/*.module_id
+CUDA/**/*.cudafe1.*
+CUDA/**/*.ii
+CUDA/**/*.reg.c
+CUDA/**/*_dlink.*
+# a.out от ручной компиляции nvcc
+CUDA/**/a.out
 
 # Примеры с несколькими .cu в одной директории (02-shared, 04-reduction/00..01,
 # 05-scan, 06-cublas) выдают бинарники с уникальными именами.
 CUDA/03-memory-model/01-uncoalesced-access/Uncoalesced
 CUDA/03-memory-model/02-shared/SharedGlobal
 CUDA/03-memory-model/02-shared/SharedLocal
+CUDA/03-memory-model/02-shared/global
+CUDA/03-memory-model/02-shared/shared
 CUDA/04-reduction/00-stupid-sum/ReduceStupid
 CUDA/04-reduction/00-stupid-sum/ReduceStupidNorm
+CUDA/04-reduction/00-stupid-sum/normal_sum
 CUDA/04-reduction/01-default-sum/ReduceDefault
 CUDA/04-reduction/01-default-sum/ReduceNoShared
 CUDA/05-scan/ScanNaiveCpu
@@ -40,6 +60,7 @@ CUDA/05-scan/ScanCorrect
 CUDA/05-scan/ScanRecursive
 CUDA/05-scan/ScanTwoLayer
 CUDA/05-scan/ScanBankConflicts
+CUDA/05-scan/ScanWarpShuffle
 CUDA/06-cublas/CublasVectorAdd
 CUDA/06-cublas/CublasVectorAdding
 CUDA/06-cublas/CublasCosine
