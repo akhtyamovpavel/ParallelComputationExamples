@@ -250,3 +250,22 @@ if(CUDAToolkit_FOUND)
 else()
     message(WARNING "CUDAToolkit не найден: 13-curand, 17-cufft, 18-cusparse пропущены")
 endif()
+
+# Topic stands use C++17 locally; existing examples keep their language level.
+add_cuda_example(05-scan/05-global-scan-compaction)
+add_cuda_example(05-scan/06-local-scan-benchmark)
+add_cuda_example(08-streams-events/03-overlap-orders)
+add_cuda_example_named(ScanWarpCheck 05-scan/06-local-scan-benchmark warp_scan_check.cu)
+add_cuda_example_named(ScanBarrierCorrected 05-scan correct_scan.cu)
+foreach(target IN ITEMS
+    cuda_05-scan_05-global-scan-compaction
+    cuda_05-scan_06-local-scan-benchmark
+    cuda_08-streams-events_03-overlap-orders
+    ScanWarpCheck
+    ScanBarrierCorrected)
+    set_target_properties(${target} PROPERTIES
+        CXX_STANDARD 17
+        CUDA_STANDARD 17
+        CXX_STANDARD_REQUIRED YES
+        CUDA_STANDARD_REQUIRED YES)
+endforeach()

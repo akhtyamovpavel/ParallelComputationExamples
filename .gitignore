@@ -68,3 +68,8 @@ CUDA/06-cublas/CublasMatrixSums
 
 # Скомпилированные OpenCL-бинарники (рядом с main.cpp, имя `main`).
 OpenCL/**/main
+
+CUDA/05-scan/06-local-scan-benchmark/ScanWarpCheck
+CUDA/05-scan/ScanBarrierCorrected
+CUDA/05-scan/corrections/scan_cpu
+CUDA/lecture-04/scan_cpu

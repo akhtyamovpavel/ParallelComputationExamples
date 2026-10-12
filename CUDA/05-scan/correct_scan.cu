@@ -48,6 +48,9 @@ __global__ void Scan(int* in_data, int* out_data) {
             // 1 2 1 0 1 2 1 4
         }
 
+        // All threads finish this level before any thread reads the next level.
+        __syncthreads();
+
         // step 2
         // 1 2 1 0 1 2 1 4
         // tid == 3

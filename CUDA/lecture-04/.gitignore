@@ -1,7 +1,0 @@
-# Binaries created by the documented commands.
-/scan_cpu
-/demo/compaction_scan
-/demo/overlap_orders
-/demo/warp_scan
-/benchmarks/scan_block_bench
-/corrections/correct_scan_barrier

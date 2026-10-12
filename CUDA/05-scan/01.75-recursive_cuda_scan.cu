@@ -18,7 +18,7 @@ __global__ void Scan(int* in_data, int* out_data, int* blockSums) {
     __syncthreads();
     
     // shift = 2^(d - 1)
-    // int step_cnt = 0;
+    int step_cnt = 0;
     // int offset = 0;
     int prev_offset = blockDim.x;
     for (unsigned int shift = 1; shift < blockDim.x; shift <<= 1 ) {
@@ -49,7 +49,7 @@ __global__ void Scan(int* in_data, int* out_data, int* blockSums) {
     
     // block_idx = 0 -> [a0, a1, a2, a3]
     // block_idx = 1 -> [a4, a5, a6, a7]
-    out_data[index] = shared_data[tid];
+    out_data[index] = shared_data[tid + (step_cnt % 2) * blockDim.x];
     if (tid == blockDim.x - 1) {
         if (blockIdx.x < gridDim.x - 1) {
             blockSums[blockIdx.x + 1] = out_data[index];
@@ -148,8 +148,25 @@ int main() {
     //     std::cout << h_localscan[i] << std::endl;
     // }
 
+    bool correct = true;
+    for (int i = 0; i < array_size; ++i) {
+        if (h_localscan[i] != i + 1) {
+            std::cerr << "Incorrect global prefix at " << i << std::endl;
+            correct = false;
+            break;
+        }
+    }
+    std::cout << "check=" << (correct ? "OK" : "FAIL") << std::endl;
+    cudaFree(d_array);
+    cudaFree(d_localscan);
+    cudaFree(d_blocksums);
+    cudaFree(d_blocksums_prefix);
+    cudaFree(d_block_block_sums);
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
     delete[] h_array;
     delete[] h_localscan;
 
     // delete[] h_blocksums;
+    return correct ? 0 : 1;
 }

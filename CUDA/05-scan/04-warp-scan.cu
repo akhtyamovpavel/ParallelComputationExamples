@@ -65,8 +65,16 @@ __global__ void BlockScanWarp(const int* in, int* out, int n) {
     }
     __syncthreads();
 
-    if (warp_id == 0 && lane < num_warps) {
-        warp_sums[lane] = warp_inclusive_scan(warp_sums[lane]);
+    // Every lane named in FULL participates, including lanes without a warp sum.
+    if (warp_id == 0) {
+        int sum = 0;
+        if (lane < num_warps) {
+            sum = warp_sums[lane];
+        }
+        int prefix = warp_inclusive_scan(sum);
+        if (lane < num_warps) {
+            warp_sums[lane] = prefix;
+        }
     }
     __syncthreads();
 
@@ -154,5 +162,5 @@ int main() {
     CUDA_CHECK(cudaFree(d_out));
     delete[] h_in;
     delete[] h_out;
-    return 0;
+    return ok ? 0 : 1;
 }
