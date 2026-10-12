@@ -1,0 +1,12 @@
+--- CUDA/05-scan/correct_scan.cu
++++ corrections/correct_scan_barrier.cu
+@@ -47,6 +47,9 @@
+ 
+             // 1 2 1 0 1 2 1 4
+         }
++
++        // All threads finish this level before any thread reads the next level.
++        __syncthreads();
+ 
+         // step 2
+         // 1 2 1 0 1 2 1 4
